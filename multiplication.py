@@ -12,9 +12,13 @@ from datetime import datetime
 
 def generate_problem():
     """Generate multiplication problem with factors both 2-15."""
-    factor1 = random.randint(2, 15)
+    factor1 = random.randint(2, 2)
     factor2 = random.randint(2, 15)
-    return factor1, factor2
+    # Randomly switch the order of return
+    if random.choice([True, False]):
+        return factor1, factor2
+    else:
+        return factor2, factor1
 
 
 def generate_drill_sheet():
