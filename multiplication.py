@@ -12,7 +12,7 @@ from datetime import datetime
 
 def generate_problem():
     """Generate multiplication problem with factors both 2-15."""
-    factor1 = random.randint(2, 2)
+    factor1 = random.randint(2, 15)
     factor2 = random.randint(2, 15)
     # Randomly switch the order of return
     if random.choice([True, False]):
@@ -22,13 +22,13 @@ def generate_problem():
 
 
 def generate_drill_sheet():
-    """Generate LaTeX with 90 problems - no title."""
-    problems = [generate_problem() for _ in range(90)]
+    """Generate LaTeX with 60 problems - no title."""
+    problems = [generate_problem() for _ in range(120)]
     
     lines = []
     
-    lines.append(r'\documentclass[12pt]{article}')
-    lines.append(r'\usepackage[margin=0.6in]{geometry}')
+    lines.append(r'\documentclass[11pt]{article}')
+    lines.append(r'\usepackage[margin=0.35in]{geometry}')
     lines.append(r'\usepackage{amsmath}')
     lines.append(r'\usepackage{array}')
     lines.append(r'\pagestyle{empty}')
@@ -41,15 +41,16 @@ def generate_drill_sheet():
     
     # Problems only - no title section
     lines.append(r'\begin{center}')
-    lines.append(r'\renewcommand{\arraystretch}{3.2}')
-    lines.append(r'\begin{tabular}{' + 'c@{\\hspace{45pt}}' * 5 + 'c}')
+    lines.append(r'\renewcommand{\arraystretch}{2.2}')
+    lines.append(r'\begin{tabular}{' + 'c@{\\hspace{22pt}}' * 5 + 'c}')
     
     problem_idx = 0
-    for row in range(15):
+
+    for row in range(20):  # 10 rows × 6 columns = 60 problems
         row_content = []
         for col in range(6):
             factor1, factor2 = problems[problem_idx]
-            cell = r'$%d \times %d = \underline{\hspace{1.5cm}}$' % (factor1, factor2)
+            cell = r'$%d \times %d = \underline{\hspace{1cm}}$' % (factor1, factor2)
             row_content.append(cell)
             problem_idx += 1
         lines.append(' & '.join(row_content) + r' \\')
