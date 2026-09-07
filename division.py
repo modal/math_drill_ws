@@ -1,32 +1,31 @@
 #!/usr/bin/env python3
 """
-Division Drill - Fixed bracket notation
-Uses \overline for proper long division rendering
+Division Drill Sheet Generator
+- Outputs to tex/ directory
+- 90 problems evenly spread (6 cols x 15 rows)
+- Divisors 2-15, quotients 2-15
 """
 
+import os
 import random
 
 
-def generate_division_problem(min_dividend=2, max_dividend=15*15, 
-                               min_divisor=2, max_divisor=15):
-    """Generate a division problem with whole number result."""
-    divisor = random.randint(min_divisor, max_divisor)
-    quotient = random.randint(min_dividend // divisor, max_dividend // divisor)
+def generate_problem():
+    """Generate division problem with divisor and quotient both 2-15."""
+    divisor = random.randint(2, 15)
+    quotient = random.randint(2, 15)
     dividend = divisor * quotient
     return dividend, divisor, quotient
 
 
-def generate_fixed_document(num_problems=90, problems_per_row=5):
-    """Generate using proper \overline notation."""
-    problems = []
-    for _ in range(num_problems):
-        dividend, divisor, quotient = generate_division_problem()
-        problems.append((dividend, divisor, quotient))
+def generate_drill_sheet():
+    """Generate LaTeX with 90 problems evenly spread."""
+    problems = [generate_problem() for _ in range(90)]
     
     lines = []
     
     lines.append(r'\documentclass[12pt]{article}')
-    lines.append(r'\usepackage[margin=0.75in]{geometry}')
+    lines.append(r'\usepackage[margin=0.5in]{geometry}')
     lines.append(r'\usepackage{amsmath}')
     lines.append(r'\usepackage{array}')
     lines.append(r'\pagestyle{empty}')
@@ -35,44 +34,47 @@ def generate_fixed_document(num_problems=90, problems_per_row=5):
     lines.append('')
     
     lines.append(r'\begin{document}')
-    lines.append(r'\begin{center}')
-    lines.append(r'{\Large\textbf{Division Practice Drill Sheet}}\\[0.3cm]')
-    lines.append(r'Name: \underline{\hspace{6cm}} \hspace{1cm} Date: \underline{\hspace{3cm}}')
-    lines.append(r'\end{center}')
-    lines.append(r'\vspace{0.5cm}')
     lines.append('')
     
-    num_cols = problems_per_row
-    total_rows = (num_problems + num_cols - 1) // num_cols
+    lines.append(r'\begin{center}')
+    lines.append(r'\textbf{\Large Division Practice Drill}\\[0.3cm]')
+    lines.append(r'\small Solve each problem. Show your work.')
+    lines.append(r'\end{center}')
+    lines.append(r'\vspace{0.4cm}')
+    lines.append('')
     
     lines.append(r'\begin{center}')
-    lines.append(r'\renewcommand{\arraystretch}{2.5}')
-    lines.append(r'\begin{tabular}{' + '|c' * num_cols + '|}')
-    lines.append(r'\hline')
+    lines.append(r'\renewcommand{\arraystretch}{2.4}')
+    lines.append(r'\begin{tabular}{' + 'c@{\\hspace{28pt}}' * 5 + 'c}')
     
     problem_idx = 0
-    for row in range(total_rows):
+    for row in range(15):
         row_content = []
-        for col in range(num_cols):
-            if problem_idx < num_problems:
-                dividend, divisor, _ = problems[problem_idx]
-                # CORRECT: divisor outside, overline on dividend
-                # Format: divisor )̄ dividend  (with line over dividend)
-                cell = r'$%d \overline{\smash{)}\, %d}$' % (divisor, dividend)
-                row_content.append(cell)
-                problem_idx += 1
-            else:
-                row_content.append('')
-        lines.append(' & '.join(row_content) + r' \\ \hline')
+        for col in range(6):
+            dividend, divisor, _ = problems[problem_idx]
+            cell = r'$%d \overline{\smash{)}\, %d}$' % (divisor, dividend)
+            row_content.append(cell)
+            problem_idx += 1
+        lines.append(' & '.join(row_content) + r' \\')
     
     lines.append(r'\end{tabular}')
     lines.append(r'\end{center}')
+    lines.append('')
     lines.append(r'\end{document}')
     
     return '\n'.join(lines)
 
 
 if __name__ == '__main__':
-    with open('division_drill.tex', 'w') as f:
-        f.write(generate_fixed_document(90))
-    print("Created: division_drill.tex")
+    # Create tex directory if it doesn't exist
+    os.makedirs('tex', exist_ok=True)
+    
+    # Generate and save to tex/ directory
+    latex_code = generate_drill_sheet()
+    output_path = os.path.join('tex', 'division_drill.tex')
+    
+    with open(output_path, 'w') as f:
+        f.write(latex_code)
+    
+    print(f'Created: {output_path}')
+    print('To compile: cd tex && pdflatex division_drill.tex')
