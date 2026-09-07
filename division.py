@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
 Division Drill Sheet Generator
-- No title - just problems
-- Filename: division_drill_YYYYMMDD_HHMM.tex
+- Generates .tex file in tex/
+- Auto-compiles to PDF in pdf/
+- Filename: division_drill_YYYYMMDD_HHMM
 """
 
 import os
 import random
+import subprocess
 from datetime import datetime
 
 
@@ -19,7 +21,7 @@ def generate_problem():
 
 
 def generate_drill_sheet():
-    """Generate LaTeX with 90 problems - no title."""
+    """Generate LaTeX with 90 problems."""
     problems = [generate_problem() for _ in range(90)]
     
     lines = []
@@ -36,7 +38,6 @@ def generate_drill_sheet():
     lines.append(r'\begin{document}')
     lines.append('')
     
-    # Problems only - no title section
     lines.append(r'\begin{center}')
     lines.append(r'\renewcommand{\arraystretch}{3.2}')
     lines.append(r'\begin{tabular}{' + 'c@{\\hspace{45pt}}' * 5 + 'c}')
@@ -59,14 +60,53 @@ def generate_drill_sheet():
     return '\n'.join(lines)
 
 
+def compile_tex_to_pdf(tex_path, pdf_dir):
+    """Compile .tex file to PDF using pdflatex, output to pdf_dir."""
+    tex_file = os.path.basename(tex_path)
+    
+    try:
+        # Run pdflatex twice to resolve references (standard practice)
+        for _ in range(2):
+            result = subprocess.run(
+                ['pdflatex', '-interaction=nonstopmode', '-output-directory', pdf_dir, tex_path],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+        
+        pdf_filename = tex_file.replace('.tex', '.pdf')
+        pdf_path = os.path.join(pdf_dir, pdf_filename)
+        print(f'PDF created: {pdf_path}')
+        return pdf_path
+        
+    except subprocess.CalledProcessError as e:
+        print(f'Error compiling PDF: {e}')
+        print(f'stdout: {e.stdout[-500:]}')  # Last 500 chars
+        print(f'stderr: {e.stderr[-500:]}')
+        return None
+    except FileNotFoundError:
+        print('ERROR: pdflatex not found in PATH')
+        print('Make sure MiKTeX or TeX Live is installed and pdflatex is in your system PATH')
+        return None
+
+
 if __name__ == '__main__':
-    os.makedirs('tex', exist_ok=True)
+    # Create output directories
+    tex_dir = 'tex'
+    pdf_dir = 'pdf'
+    os.makedirs(tex_dir, exist_ok=True)
+    os.makedirs(pdf_dir, exist_ok=True)
     
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
     filename = f'division_drill_{timestamp}.tex'
-    output_path = os.path.join('tex', filename)
+    tex_path = os.path.join(tex_dir, filename)
     
-    with open(output_path, 'w') as f:
+    # Generate .tex file
+    with open(tex_path, 'w') as f:
         f.write(generate_drill_sheet())
     
-    print(f'Created: {output_path}')
+    print(f'Created: {tex_path} with 90 problems (15 rows)')
+    
+    # Auto-compile to PDF (saved to pdf/ directory)
+    print('Compiling to PDF...')
+    compile_tex_to_pdf(tex_path, pdf_dir)
