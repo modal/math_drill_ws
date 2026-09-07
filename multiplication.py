@@ -8,7 +8,6 @@ Multiplication Drill Sheet Generator
 import os
 import random
 import subprocess
-import shutil
 from datetime import datetime
 
 # CONFIG: Set total number of problems (must be divisible by 6)
