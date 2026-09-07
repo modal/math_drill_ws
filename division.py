@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 Division Drill Sheet Generator
-- Outputs to tex/ directory
-- 90 problems evenly spread (6 cols x 15 rows)
-- Divisors 2-15, quotients 2-15
+- No title - just problems
+- Filename: division_drill_YYYYMMDD_HHMM.tex
 """
 
 import os
 import random
+from datetime import datetime
 
 
 def generate_problem():
@@ -19,13 +19,13 @@ def generate_problem():
 
 
 def generate_drill_sheet():
-    """Generate LaTeX with 90 problems evenly spread."""
+    """Generate LaTeX with 90 problems - no title."""
     problems = [generate_problem() for _ in range(90)]
     
     lines = []
     
     lines.append(r'\documentclass[12pt]{article}')
-    lines.append(r'\usepackage[margin=0.5in]{geometry}')
+    lines.append(r'\usepackage[margin=0.6in]{geometry}')
     lines.append(r'\usepackage{amsmath}')
     lines.append(r'\usepackage{array}')
     lines.append(r'\pagestyle{empty}')
@@ -36,16 +36,10 @@ def generate_drill_sheet():
     lines.append(r'\begin{document}')
     lines.append('')
     
+    # Problems only - no title section
     lines.append(r'\begin{center}')
-    lines.append(r'\textbf{\Large Division Practice Drill}\\[0.3cm]')
-    lines.append(r'\small Solve each problem. Show your work.')
-    lines.append(r'\end{center}')
-    lines.append(r'\vspace{0.4cm}')
-    lines.append('')
-    
-    lines.append(r'\begin{center}')
-    lines.append(r'\renewcommand{\arraystretch}{2.4}')
-    lines.append(r'\begin{tabular}{' + 'c@{\\hspace{28pt}}' * 5 + 'c}')
+    lines.append(r'\renewcommand{\arraystretch}{3.2}')
+    lines.append(r'\begin{tabular}{' + 'c@{\\hspace{45pt}}' * 5 + 'c}')
     
     problem_idx = 0
     for row in range(15):
@@ -66,15 +60,13 @@ def generate_drill_sheet():
 
 
 if __name__ == '__main__':
-    # Create tex directory if it doesn't exist
     os.makedirs('tex', exist_ok=True)
     
-    # Generate and save to tex/ directory
-    latex_code = generate_drill_sheet()
-    output_path = os.path.join('tex', 'division_drill.tex')
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+    filename = f'division_drill_{timestamp}.tex'
+    output_path = os.path.join('tex', filename)
     
     with open(output_path, 'w') as f:
-        f.write(latex_code)
+        f.write(generate_drill_sheet())
     
     print(f'Created: {output_path}')
-    print('To compile: cd tex && pdflatex division_drill.tex')
