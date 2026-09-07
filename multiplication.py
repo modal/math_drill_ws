@@ -9,10 +9,13 @@ import os
 import random
 from datetime import datetime
 
+# CONFIG: Set total number of problems (must be divisible by 6)
+NUM_PROBLEMS = 120
+
 
 def generate_problem():
     """Generate multiplication problem with factors both 2-15."""
-    factor1 = random.randint(2, 15)
+    factor1 = random.randint(5, 5)
     factor2 = random.randint(2, 15)
     # Randomly switch the order of return
     if random.choice([True, False]):
@@ -22,8 +25,13 @@ def generate_problem():
 
 
 def generate_drill_sheet():
-    """Generate LaTeX with 60 problems - no title."""
-    problems = [generate_problem() for _ in range(120)]
+    """Generate LaTeX with configurable number of problems."""
+    if NUM_PROBLEMS % 6 != 0:
+        raise ValueError(f"NUM_PROBLEMS ({NUM_PROBLEMS}) must be divisible by 6")
+    
+    num_rows = NUM_PROBLEMS // 6
+    
+    problems = [generate_problem() for _ in range(NUM_PROBLEMS)]
     
     lines = []
     
@@ -45,8 +53,7 @@ def generate_drill_sheet():
     lines.append(r'\begin{tabular}{' + 'c@{\\hspace{22pt}}' * 5 + 'c}')
     
     problem_idx = 0
-
-    for row in range(20):  # 10 rows × 6 columns = 60 problems
+    for row in range(num_rows):  # Auto-calculated: NUM_PROBLEMS ÷ 6
         row_content = []
         for col in range(6):
             factor1, factor2 = problems[problem_idx]
@@ -73,4 +80,4 @@ if __name__ == '__main__':
     with open(output_path, 'w') as f:
         f.write(generate_drill_sheet())
     
-    print(f'Created: {output_path}')
+    print(f'Created: {output_path} with {NUM_PROBLEMS} problems ({NUM_PROBLEMS//6} rows)')
