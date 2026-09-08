@@ -69,7 +69,6 @@ def generate_drill_sheet():
 
 def compile_tex_to_pdf(tex_path, pdf_dir):
     """Compile .tex file to PDF using pdflatex, output to pdf_dir."""
-    tex_dir = os.path.dirname(tex_path)
     tex_file = os.path.basename(tex_path)
     
     try:
