@@ -11,6 +11,7 @@ import random
 import subprocess
 from datetime import datetime
 
+NUM_PROBLEMS = 120
 
 def generate_problem():
     """Generate division problem with divisor and quotient both 2-15."""
@@ -21,8 +22,6 @@ def generate_problem():
 
 
 def generate_drill_sheet():
-    """Generate LaTeX with 90 problems."""
-    problems = [generate_problem() for _ in range(90)]
     
     lines = []
     
@@ -41,15 +40,13 @@ def generate_drill_sheet():
     lines.append(r'\begin{center}')
     lines.append(r'\renewcommand{\arraystretch}{3.2}')
     lines.append(r'\begin{tabular}{' + 'c@{\\hspace{45pt}}' * 5 + 'c}')
-    
-    problem_idx = 0
+
     for row in range(15):
         row_content = []
         for col in range(6):
-            dividend, divisor, _ = problems[problem_idx]
+            dividend, divisor, _ = generate_problem()  # Generate on-the-fly
             cell = r'$%d \overline{\smash{)}\, %d}$' % (divisor, dividend)
             row_content.append(cell)
-            problem_idx += 1
         lines.append(' & '.join(row_content) + r' \\')
     
     lines.append(r'\end{tabular}')
@@ -105,7 +102,7 @@ if __name__ == '__main__':
     with open(tex_path, 'w') as f:
         f.write(generate_drill_sheet())
     
-    print(f'Created: {tex_path} with 90 problems (15 rows)')
+    print(f'Created: {tex_path} with {NUM_PROBLEMS} problems ({NUM_PROBLEMS//6} rows)')
     
     # Auto-compile to PDF (saved to pdf/ directory)
     print('Compiling to PDF...')
