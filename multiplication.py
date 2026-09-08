@@ -32,8 +32,6 @@ def generate_drill_sheet():
     
     num_rows = NUM_PROBLEMS // 6
     
-    problems = [generate_problem() for _ in range(NUM_PROBLEMS)]
-    
     lines = []
     
     lines.append(r'\documentclass[11pt]{article}')
@@ -53,14 +51,12 @@ def generate_drill_sheet():
     lines.append(r'\renewcommand{\arraystretch}{2.2}')
     lines.append(r'\begin{tabular}{' + 'c@{\\hspace{22pt}}' * 5 + 'c}')
     
-    problem_idx = 0
     for row in range(num_rows):
         row_content = []
         for col in range(6):
-            factor1, factor2 = problems[problem_idx]
+            factor1, factor2 = generate_problem()  # Generate on-the-fly
             cell = r'$%d \times %d = \underline{\hspace{1cm}}$' % (factor1, factor2)
             row_content.append(cell)
-            problem_idx += 1
         lines.append(' & '.join(row_content) + r' \\')
     
     lines.append(r'\end{tabular}')
